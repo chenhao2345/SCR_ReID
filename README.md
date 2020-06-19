@@ -1,7 +1,8 @@
 # Spatial-Channel Partition Network
 Implement of paper:[Learning Discriminative and Generalizable Representations by Spatial-Channel
-Partition for Person Re-Identification](http://openaccess.thecvf.com/content_WACV_2020/papers/Chen_Learning_Discriminative_and_Generalizable_Representations_by_Spatial-Channel_Partition_for_Person_WACV_2020_paper.pdf)
+Partition for Person Re-Identification](http://openaccess.thecvf.com/content_WACV_2020/papers/Chen_Learning_Discriminative_and_Generalizable_Representations_by_Spatial-Channel_Partition_for_Person_WACV_2020_paper.pdf).
 
+This implementation is based on [ReID-MGN](https://github.com/GNAYUOHZ/ReID-MGN).
 ## Dependencies
 
 - Python >= 3.5
