@@ -39,8 +39,8 @@ class MGN(nn.Module):
         self.p3 = nn.Sequential(copy.deepcopy(res_conv4), copy.deepcopy(res_p_conv5))
 
         self.maxpool_zg_p1 = nn.AdaptiveMaxPool2d((1, 1))  # nn.MaxPool2d(kernel_size=(12, 4))
-        self.maxpool_zg_p2 = nn.AdaptiveMaxPool2d((1, 1))  # nn.MaxPool2d(kernel_size=(24, 8))
-        self.maxpool_zg_p3 = nn.AdaptiveMaxPool2d((1, 1))  # nn.MaxPool2d(kernel_size=(24, 8))
+        self.maxpool_h2 = nn.AdaptiveMaxPool2d((2, 1))
+        self.maxpool_h3 = nn.AdaptiveMaxPool2d((3, 1))
 
         self.reduction_p1 = nn.Sequential(nn.Conv2d(2048, feats, 1, bias=False), nn.BatchNorm2d(feats))  # p1
         self.reduction_p2 = nn.Sequential(nn.Conv2d(2048, feats, 1, bias=False), nn.BatchNorm2d(feats))  # p2
@@ -87,6 +87,7 @@ class MGN(nn.Module):
         self.fc_id_p3_c3 = nn.Linear(feats, num_classes)
 
         self._init_fc(self.fc_id_p1)
+
         self._init_fc(self.fc_id_p2)
         self._init_fc(self.fc_id_p2_s1)
         self._init_fc(self.fc_id_p2_s2)
@@ -125,31 +126,33 @@ class MGN(nn.Module):
         p2 = self.p2(x)
         p3 = self.p3(x)
 
-        zp1 = self.maxpool_zg_p1(p1)
+        zg_p1 = self.maxpool_zg_p1(p1)
 
+        zg_p2 = self.maxpool_zg_p1(p2)
         zp2 = self.maxpool_h2(p2)
         z0_p2 = zp2[:, :, 0:1, :]
         z1_p2 = zp2[:, :, 1:2, :]
-        z_c0_p2 = zp2[:, :1024, :, :]
-        z_c1_p2 = zp2[:, 1024:2048, :, :]
+        z_c0_p2 = zg_p2[:, :1024, :, :]
+        z_c1_p2 = zg_p2[:, 1024:2048, :, :]
 
+        zg_p3 = self.maxpool_zg_p1(p3)
         zp3 = self.maxpool_h3(p3)
         z0_p3 = zp3[:, :, 0:1, :]
         z1_p3 = zp3[:, :, 1:2, :]
         z2_p3 = zp3[:, :, 2:3, :]
-        z_c0_p3 = zp3[:, :683, :, :]
-        z_c1_p3 = zp3[:, 683:683 * 2, :, :]
-        z_c2_p3 = zp3[:, 683 * 2:2048, :, :]
+        z_c0_p3 = zg_p3[:, :683, :, :]
+        z_c1_p3 = zg_p3[:, 683:683 * 2, :, :]
+        z_c2_p3 = zg_p3[:, 683 * 2:2048, :, :]
 
-        f_p1 = self.reduction_p1(zp1).squeeze(dim=3).squeeze(dim=2)
+        f_p1 = self.reduction_p1(zg_p1).squeeze(dim=3).squeeze(dim=2)
 
-        f_p2 = self.reduction_p2(zp2).squeeze(dim=3).squeeze(dim=2)
+        f_p2 = self.reduction_p2(zg_p2).squeeze(dim=3).squeeze(dim=2)
         f_p2_c1 = self.reduction_p2_c1(z_c0_p2).squeeze(dim=3).squeeze(dim=2)
         f_p2_c2 = self.reduction_p2_c2(z_c1_p2).squeeze(dim=3).squeeze(dim=2)
         f_p2_s1 = self.reduction_p2_s1(z0_p2).squeeze(dim=3).squeeze(dim=2)
         f_p2_s2 = self.reduction_p2_s2(z1_p2).squeeze(dim=3).squeeze(dim=2)
 
-        f_p3 = self.reduction_p3(zp3).squeeze(dim=3).squeeze(dim=2)
+        f_p3 = self.reduction_p3(zg_p3).squeeze(dim=3).squeeze(dim=2)
         f_p3_c1 = self.reduction_p3_c1(z_c0_p3).squeeze(dim=3).squeeze(dim=2)
         f_p3_c2 = self.reduction_p3_c2(z_c1_p3).squeeze(dim=3).squeeze(dim=2)
         f_p3_c3 = self.reduction_p3_c3(z_c2_p3).squeeze(dim=3).squeeze(dim=2)
