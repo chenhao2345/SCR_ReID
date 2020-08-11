@@ -12,7 +12,7 @@ parser.add_argument('--data_path',
 
 
 parser.add_argument('--mode',
-                    default='train', choices=['train', 'evaluate', 'vis', 'inference'],
+                    default='train', choices=['train', 'evaluate'],
                     help='train or evaluate ')
 
 parser.add_argument('--query_image',
