@@ -279,7 +279,7 @@ if __name__ == '__main__':
             if epoch % 50 == 0:
                 print('\nstart evaluate')
                 reid.evaluate()
-            torch.save(model.state_dict(), os.path.join('weights', opt.save_path, 'model_{}.pth'.format(epoch)))
+                torch.save(model.state_dict(), os.path.join('weights', opt.save_path, 'model_{}.pth'.format(epoch)))
 
     if opt.mode == 'evaluate':
         print('start evaluate')
